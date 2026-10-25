@@ -1,7 +1,3 @@
-"""Neural modules of the best tested M3 optimized extension (71.54% accuracy).
-
-This is not the strict MLS-GSAR paper architecture. Trained weights are separate.
-"""
 import math
 
 import torch
@@ -75,7 +71,6 @@ class LocalGlobalFeatures(nn.Module):
 
 
 class M3Query(nn.Module):
-    """M3 only; parameter names remain compatible with the selected checkpoint."""
     def __init__(self):
         super().__init__()
         self.context = nn.TransformerEncoder(

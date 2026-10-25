@@ -1,8 +1,3 @@
-"""M3-only inference. Inputs are sensor signals, never labels or source IDs.
-
-Supply the four trained checkpoints and classifier normalization separately.
-All paths are explicit; no historical experiment scripts are imported.
-"""
 import os
 from pathlib import Path
 
@@ -54,7 +49,6 @@ def _group_statistics(features, prior, groups, affinity):
 
 
 class BestM3:
-    """Selected optimized M3: fixed marginal decoder, confidence and .25 mixture."""
     def __init__(self, encoder, query, relation, classifier, signal_mean, signal_std,
                  classifier_mean, classifier_std, device="cpu"):
         _deterministic_inference()
@@ -118,7 +112,6 @@ class BestM3:
 
     @torch.no_grad()
     def predict_components(self, components):
-        """Run M3 on its 257D sensor components; useful for feature-cache reuse."""
         components = np.asarray(components, dtype=np.float32)
         if components.ndim != 3 or components.shape[1:] != (10, 257) or not len(components):
             raise ValueError("Expected nonempty [batch, 10, 257] sensor components")
