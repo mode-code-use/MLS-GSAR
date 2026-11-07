@@ -27,8 +27,7 @@ its assumptions and metric definitions are explicit in [TRAINING.md](TRAINING.md
 
 ## Train and test your own model
 
-Install dependencies, prepare UT-Group, train, then evaluate a held-out split.
-See [TRAINING.md](TRAINING.md) for the required input fields:
+Install dependencies, prepare UT-Group, train, then evaluate a held-out split:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -45,8 +44,6 @@ The output directory `runs/m3` contains all five inference artifacts. Point the
 Python API below to that directory instead of obtaining external weights.
 Unlabeled prediction is also available through
 `python predict.py --input signals.npy --checkpoints runs/m3 --output predictions.npz`.
-See [TRAINING.md](TRAINING.md) for stage budgets, losses, testing and a quick smoke
-run; see `python train.py --help` and `python evaluate.py --help` for CLI options.
 
 ## Installation
 
@@ -113,10 +110,6 @@ The returned dictionary contains:
 | `activities` | `[batch_size, 10]` | Activity ID per person, shared within a predicted group. IDs 0-9 follow the training label mapping; `-1` denotes the noise class, internally encoded as 10. |
 | `affinity` | `[batch_size, 10, 10]` | Symmetric pairwise membership scores in [0, 1]. They are scores, not ground-truth relations or guaranteed calibrated probabilities. |
 
-The semantic activity-name mapping is not included in these two source files.
-Use the mapping associated with the training data. Do not interpret group IDs as
-activity labels. Group assignments are decoded from the query predictions, not
-by thresholding the returned affinity matrix.
 
 ## Required checkpoints
 
@@ -140,14 +133,6 @@ checkpoints/
 | Relation | PyTorch dictionary whose `model` entry is a compatible `RelationConfidence` state dict. |
 | Classifier | PyTorch dictionary whose `model` entry is a compatible `GroupClassifier` state dict. |
 | Classifier normalization | NPZ file with `mean` and `std`, each of shape `(771,)`. |
-
-Standard deviations must be positive. Use statistics fitted on the training
-partition and the matching checkpoints. Renaming an unrelated checkpoint does
-not make it compatible. No public weight download is specified here.
-
-**Security:** load only trusted checkpoints. The loader uses
-`torch.load(..., weights_only=False)`, which can execute code when loading a
-malicious serialized file.
 
 ## Run inference
 
