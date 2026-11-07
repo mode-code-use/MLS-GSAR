@@ -158,23 +158,6 @@ np.savez_compressed("predictions.npz", **predictions)
 for name, values in predictions.items():
     print(name, values.shape, values.dtype)
 ```
-## Implementation overview
-
-1. `SignalEncoder` extracts multi-scale features with channel attention, pools
-   them into temporal tokens, and applies a Transformer encoder.
-2. Signal-derived K-means clusters provide four attention partitions.
-   `LocalGlobalFeatures` combines intra-partition and inter-partition attention.
-3. `M3Query` uses contextual features and six learned queries to estimate
-   memberships and activities. One query-class output denotes an inactive query.
-4. `RelationConfidence` refines pairwise membership scores. `GroupClassifier`
-   aggregates mean, maximum, standard deviation, group size, cohesion, and
-   external affinity into 771-dimensional group features.
-5. The inference wrapper combines group classifier probabilities with the
-   activity prior using the fixed weights in the source code.
-
-The wrapper enables deterministic PyTorch settings and a fixed K-means seed.
-These settings do not guarantee bitwise identity across all hardware, software
-versions, devices, or batching arrangements.
 
 ## Data and paper
 
