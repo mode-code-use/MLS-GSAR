@@ -5,13 +5,6 @@ architecture. The original two model/inference files are unchanged. It exports
 artifacts compatible with `BestM3.from_checkpoints` and does not require the
 authors' local experiment folders or existing checkpoints.
 
-**Scope:** the training schedule below is newly packaged from the existing
-operators. It does not recreate the full historical experiment search,
-supervised-backbone selection, augmentation budget or paper's low-label
-protocol. In particular, successful execution or training to convergence is not
-a guarantee of the paper's table values, 70% accuracy, or a particular ablation
-ordering. Use the recorded configuration when reporting a new experiment.
-
 ## Commands
 
 Install Python 3.11 and dependencies:
