@@ -101,9 +101,9 @@ The returned dictionary contains:
 
 | Key | Shape | Meaning |
 | --- | --- | --- |
-| `groups` | `[batch_size, 10]` | Predicted query/group ID for each person. IDs are local to each scene and need not be consecutive. |
+| `groups` | `[batch_size, 10]` | Predicted query/group ID for each person. |
 | `activities` | `[batch_size, 10]` | Activity ID per person, shared within a predicted group. IDs 0-9 follow the training label mapping; `-1` denotes the noise class, internally encoded as 10. |
-| `affinity` | `[batch_size, 10, 10]` | Symmetric pairwise membership scores in [0, 1]. They are scores, not ground-truth relations or guaranteed calibrated probabilities. |
+| `affinity` | `[batch_size, 10, 10]` | Symmetric pairwise membership scores in [0, 1]. |
 
 
 ## Required checkpoints
