@@ -13,7 +13,7 @@ member activity predictions, and pairwise membership scores.
 | --- | --- |
 | `best_m3_model.py` | Signal encoder, local/global attention, query-based group prediction, relation confidence model, and group activity classifier. |
 | `best_m3_predict.py` | Checkpoint loading, normalization, feature extraction, group decoding, and end-to-end inference through `BestM3`. |
-| `prepare_data.py`, `ut_data.py`, `scene_data.py`, `dataset.py` | Ten-person UT-Group scene preparation, explicit scene schema, and train/validation/test overlap checks. |
+| `prepare_data.py`, `ut_data.py`, `scene_data.py`, `dataset.py` | Data preparation, input validation, and train/validation/test overlap checks. |
 | `train.py`, `workflow.py`, `training_loss.py`, `augment.py` | Standalone staged training with checkpoint export and documented assumptions. |
 | `evaluate.py`, `predict.py` | Held-out labeled evaluation and unlabeled signal inference CLIs. |
 | `tests/` | Unit tests and random smoke fixtures, not benchmark datasets. |
@@ -27,8 +27,8 @@ its assumptions and metric definitions are explicit in [TRAINING.md](TRAINING.md
 
 ## Train and test your own model
 
-Read [DATA_FORMAT.md](DATA_FORMAT.md) before preparing data. Install dependencies,
-prepare ten-person UT-Group inputs, train, then evaluate a held-out split:
+Install dependencies, prepare UT-Group, train, then evaluate a held-out split.
+See [TRAINING.md](TRAINING.md) for the required input fields:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -38,13 +38,8 @@ python evaluate.py --data data/ut/test.npz --checkpoints runs/m3 --output runs/m
 ```
 
 Windows users should replace `/path/to/gar_data_ut.npz` with their actual path,
-quoted if it contains spaces. UT-Group training and evaluation inputs in this
-workflow contain **10 people per scene**. Data already following the documented
-ten-person scene schema can be supplied directly without `prepare_data.py`.
-The UT preparation command produces that scene format from the specifically
-supported source archive. Source provenance, archive structure, and construction
-of scene membership labels are documented in [DATA_FORMAT.md](DATA_FORMAT.md);
-the adapter is not a generic importer for arbitrary group archives.
+quoted if it contains spaces. Data already following the training input format
+can be supplied directly without `prepare_data.py`.
 
 The output directory `runs/m3` contains all five inference artifacts. Point the
 Python API below to that directory instead of obtaining external weights.
@@ -185,10 +180,9 @@ for name, values in predictions.items():
 ```
 
 `python best_m3_predict.py` does not run training or inference: use the Python API
-above. Training and evaluation CLIs are `train.py` and `evaluate.py`. Ten-person
-UT-Group inputs can be prepared with `prepare_data.py`; source-format requirements
-and label provenance are specified in `DATA_FORMAT.md`. Other datasets need
-explicit compatible annotations.
+above. Training and evaluation CLIs are `train.py` and `evaluate.py`. UT-Group
+can be prepared with `prepare_data.py`. Required training fields are described
+in `TRAINING.md`.
 
 For cached features, `model.encode(signals)` returns `[batch_size, 10, 257]`
 components: 128 temporal features, 128 CNN features, and one signal-derived
@@ -215,9 +209,7 @@ versions, devices, or batching arrangements.
 
 ## Data and paper
 
-- UT-Group inputs: **10 people per prepared scene**, with 200 time steps and
-  6 sensor channels per person. See [DATA_FORMAT.md](DATA_FORMAT.md) for source
-  provenance and scene-label construction.
+- Dataset: **UT-Group**.
 - Author-provided dataset page: <https://www.kaggle.com/datasets/codeusea/mls-gsar>
 - Paper title: *MLS-GSAR: Group Segmentation and Activity Recognition Method
   Based on a Multi-task Lightweight Self-supervised Framework*.

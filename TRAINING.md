@@ -20,8 +20,8 @@ Install Python 3.11 and dependencies:
 python -m pip install -r requirements.txt
 ```
 
-Prepare the audited UT archive using the command in `DATA_FORMAT.md`, or supply
-compatible pre-split scene archives. Train without reading test data:
+Prepare UT-Group using the command in `README.md`, or supply compatible pre-split
+scene archives. Train without reading test data:
 
 ```bash
 python train.py --train data/ut/train.npz --val data/ut/val.npz --output runs/m3 --device cpu
@@ -38,6 +38,33 @@ Both commands refuse existing output directories. Evaluation writes
 `metrics.json` and `predictions.npz`. It rejects sources and exact full/half
 windows found in training or validation. Do not use test results to tune
 hyperparameters, select epochs or repeatedly select better runs.
+
+## Training input fields
+
+Each NPZ archive must contain the following non-pickled arrays. Their dimensions
+must match the model input specification in `README.md`; target arrays and source
+IDs match the first two dimensions of `signals`.
+
+| Field | Required values |
+| --- | --- |
+| `signals` | Finite raw sensor signals; normalization is fitted on training data only. |
+| `groups` | Integer, contiguous scene-local group IDs, starting at zero, within the model's query capacity. |
+| `activities` | Integer group activity targets 0-9; -1 denotes noise. Members of a group have consistent activity targets. |
+| `actions` | Integer individual-action targets 0-9, not derived from group activity labels. |
+| `source_ids` | Fixed-width strings identifying the original person windows; retain the same ID whenever a window is reused. |
+
+Use separate train, validation and test archives. Split by participant, session or
+recording before constructing overlapping windows whenever metadata permit.
+Repeated source IDs and exact full/aligned nonconstant half-windows are checked;
+these checks do not prove subject/session independence when metadata are absent.
+Channel order, units and label mapping must be consistent across partitions.
+
+The UT preparation entry point expects `reshaped_segments`, `segments_labels1`
+and `segments_labels2` in the source archive and validates the supported schema;
+it is not an importer for arbitrary archives. Its manifest records the selected
+signal columns, split rows, construction provenance and limitations. Preserve
+the manifest when reporting experiments, and do not put label-derived metadata
+into model input channels.
 
 ## Training stages
 

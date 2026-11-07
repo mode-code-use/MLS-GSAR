@@ -1,4 +1,4 @@
-"""Prepare the audited five-person UT archive as synthetic ten-person scenes."""
+"""Prepare UT-Group inputs with partition-local construction and overlap checks."""
 import argparse
 from pathlib import Path
 
@@ -17,7 +17,7 @@ def main():
     p.add_argument('--accept-synthetic-scenes', action='store_true')
     args = p.parse_args()
     if not args.accept_synthetic_scenes:
-        p.error('Read DATA_FORMAT.md and explicitly pass --accept-synthetic-scenes')
+        p.error('Read TRAINING.md and explicitly pass --accept-synthetic-scenes')
     if args.output.exists():
         raise FileExistsError('Use a new output directory; existing data are never overwritten')
     data = prepare(args.data, args.labeled_ratio, args.seed, args.output)
