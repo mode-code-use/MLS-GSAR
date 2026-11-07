@@ -96,10 +96,6 @@ This is an architecture check, not trained-model inference or an accuracy test.
 - At 50 Hz, 200 time steps represent a 4-second window.
 - Channel order, units, window construction, and person grouping must match those
   used to train the supplied checkpoints. 
-- Provide unnormalized signals: the loader obtains signal statistics from the
-  backbone checkpoint, and `encode()` applies normalization and clipping.
-- Do not include activity labels, group labels, or other target-derived metadata
-  in the six signal channels. Do not use held-out data to fit normalization.
 
 The returned dictionary contains:
 
