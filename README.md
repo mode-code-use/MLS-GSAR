@@ -95,8 +95,7 @@ This is an architecture check, not trained-model inference or an accuracy test.
   per person. The batch must be nonempty.
 - At 50 Hz, 200 time steps represent a 4-second window.
 - Channel order, units, window construction, and person grouping must match those
-  used to train the supplied checkpoints. Channel meanings cannot be inferred
-  from an arbitrary NPZ filename.
+  used to train the supplied checkpoints. 
 - Provide unnormalized signals: the loader obtains signal statistics from the
   backbone checkpoint, and `encode()` applies normalization and clipping.
 - Do not include activity labels, group labels, or other target-derived metadata
