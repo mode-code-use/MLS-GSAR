@@ -1,0 +1,5 @@
+numpy==1.26.3
+torch==2.1.2
+scikit-learn==1.6.1
+scipy==1.15.2
+threadpoolctl==3.6.0

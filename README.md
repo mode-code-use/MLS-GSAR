@@ -13,11 +13,42 @@ member activity predictions, and pairwise membership scores.
 | --- | --- |
 | `best_m3_model.py` | Signal encoder, local/global attention, query-based group prediction, relation confidence model, and group activity classifier. |
 | `best_m3_predict.py` | Checkpoint loading, normalization, feature extraction, group decoding, and end-to-end inference through `BestM3`. |
+| `prepare_data.py`, `ut_data.py`, `scene_data.py`, `dataset.py` | Audited UT construction, explicit scene schema, and train/validation/test overlap checks. |
+| `train.py`, `workflow.py`, `training_loss.py`, `augment.py` | Standalone staged training with checkpoint export and documented assumptions. |
+| `evaluate.py`, `predict.py` | Held-out labeled evaluation and unlabeled signal inference CLIs. |
+| `tests/` | Unit tests and random smoke fixtures, not benchmark datasets. |
 
-The model names in these files are Python identifiers. This repository does not
-currently contain training scripts, pretrained checkpoints, or an evaluation CLI.
-Installing the dependencies alone is therefore not sufficient to reproduce the
-paper's experiments or obtain meaningful predictions with trained weights.
+The model names in these files are Python identifiers. Training, preparation,
+evaluation, requirements and execution tests are now included. Pretrained
+checkpoints and datasets are not bundled. You can train the released architecture
+from scratch and export the artifacts needed for inference. This public staged
+workflow is not a guarantee of reproducing the paper's reported table values;
+its assumptions and metric definitions are explicit in [TRAINING.md](TRAINING.md).
+
+## Train and test your own model
+
+Read [DATA_FORMAT.md](DATA_FORMAT.md) before preparing data. Install dependencies,
+prepare the audited UT archive, train, then evaluate a held-out split:
+
+```bash
+python -m pip install -r requirements.txt
+python prepare_data.py --data /path/to/gar_data_ut.npz --output data/ut --accept-synthetic-scenes
+python train.py --train data/ut/train.npz --val data/ut/val.npz --output runs/m3 --device cpu
+python evaluate.py --data data/ut/test.npz --checkpoints runs/m3 --output runs/m3_test --device cpu
+```
+
+Windows users should replace `/path/to/gar_data_ut.npz` with their actual path,
+quoted if it contains spaces. Native data already following the documented scene
+schema can be supplied directly without `prepare_data.py`. The UT adapter builds
+synthetic ten-person scenes from five-person templates; it does not convert an
+arbitrary group archive or provide native ten-person annotations.
+
+The output directory `runs/m3` contains all five inference artifacts. Point the
+Python API below to that directory instead of obtaining external weights.
+Unlabeled prediction is also available through
+`python predict.py --input signals.npy --checkpoints runs/m3 --output predictions.npz`.
+See [TRAINING.md](TRAINING.md) for stage budgets, losses, testing and a quick smoke
+run; see `python train.py --help` and `python evaluate.py --help` for CLI options.
 
 ## Installation
 
@@ -42,7 +73,7 @@ source .venv/bin/activate
 Install the dependencies used for the local inference check:
 
 ```bash
-python -m pip install torch==2.1.2 numpy==1.26.3 scikit-learn==1.6.1 threadpoolctl==3.6.0
+python -m pip install -r requirements.txt
 ```
 
 The code was checked locally with Python 3.11.7 and PyTorch 2.1.2+cu121. For CUDA,
@@ -91,7 +122,7 @@ by thresholding the returned affinity matrix.
 
 ## Required checkpoints
 
-Obtain the following mutually compatible artifacts before running inference.
+Train them with `train.py` or obtain the following mutually compatible artifacts before running inference.
 The names below are suggested local filenames, not downloadable files bundled
 with this repository:
 
@@ -150,9 +181,10 @@ for name, values in predictions.items():
     print(name, values.shape, values.dtype)
 ```
 
-There is no command-line parser: `python best_m3_predict.py` does not run training
-or inference. Use the Python API above. No automatic loader from the released
-dataset archives to ten-person scenes is included in this repository.
+`python best_m3_predict.py` does not run training or inference: use the Python API
+above. Training and evaluation CLIs are `train.py` and `evaluate.py`. The audited
+five-person UT template adapter is `prepare_data.py`; other datasets need explicit
+compatible annotations as described in `DATA_FORMAT.md`.
 
 For cached features, `model.encode(signals)` returns `[batch_size, 10, 257]`
 components: 128 temporal features, 128 CNN features, and one signal-derived
