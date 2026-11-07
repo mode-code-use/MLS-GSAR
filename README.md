@@ -158,17 +158,6 @@ np.savez_compressed("predictions.npz", **predictions)
 for name, values in predictions.items():
     print(name, values.shape, values.dtype)
 ```
-
-`python best_m3_predict.py` does not run training or inference: use the Python API
-above. Training and evaluation CLIs are `train.py` and `evaluate.py`. UT-Group
-can be prepared with `prepare_data.py`. Required training fields are described
-in `TRAINING.md`.
-
-For cached features, `model.encode(signals)` returns `[batch_size, 10, 257]`
-components: 128 temporal features, 128 CNN features, and one signal-derived
-K-means cluster ID (0-3). Pass these matching components to
-`model.predict_components(components)`. The cluster ID is not an annotation.
-
 ## Implementation overview
 
 1. `SignalEncoder` extracts multi-scale features with channel attention, pools
